@@ -3,7 +3,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
+from diagrams.gui.diagram_editor import DiagramEditor
 
 class MainWindow:
     def __init__(self):
@@ -20,15 +20,15 @@ class MainWindow:
 
         # Команда Save
         save_button = tk.Button(command_frame, text="Save", command=self.save)
-        save_button.pack(side=tk.LEFT, padx=5, pady=5)
+        save_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
         # Команда Open
         open_button = tk.Button(command_frame, text="Open", command=self.open_file)
-        open_button.pack(side=tk.LEFT, padx=5, pady=5)
+        open_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
         # Команда Exit
         exit_button = tk.Button(command_frame, text="Exit", command=self.exit_program)
-        exit_button.pack(side=tk.LEFT, padx=5, pady=5)
+        exit_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
         # Команда New page
         exit_button = tk.Button(command_frame, text="New page", command=self.new_page)
@@ -69,8 +69,8 @@ class MainWindow:
         self.tabs.add(tab, text=f"Page {self.page_count}")
 
         # Полотно для блок-схеми
-        canvas = tk.Canvas(tab, bg="white", width=600, height=400)
-        canvas.pack(fill=tk.BOTH, expand=True)
+        editor = DiagramEditor(tab)
+        editor.pack(fill=tk.BOTH, expand=True)
 
     def run(self):
         self.root.mainloop()
