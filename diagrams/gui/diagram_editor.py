@@ -10,6 +10,7 @@ class Diagram:
         self.blocks.append(block)
 
     def render(self, canvas):
+        canvas.delete("all")
         for block in self.blocks:
             block.render(canvas)
 
