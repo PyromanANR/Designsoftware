@@ -17,19 +17,15 @@ class MainWindow:
         command_frame = tk.Frame(self.root)
         command_frame.pack(side=tk.TOP, fill=tk.X)
 
-        # Команда Save
         save_button = tk.Button(command_frame, text="Save", command=self.save)
         save_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        # Команда Open
         open_button = tk.Button(command_frame, text="Open", command=self.open_file)
         open_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        # Команда Exit
         exit_button = tk.Button(command_frame, text="Exit", command=self.exit_program)
         exit_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        # Команда New page
         exit_button = tk.Button(command_frame, text="New page", command=self.new_page)
         exit_button.pack(side=tk.RIGHT, padx=5, pady=5)
 

@@ -12,7 +12,6 @@ class DiagramEditor(tk.Canvas):
         self.offset_x = 0  # Зміщення миші по X
         self.offset_y = 0  # Зміщення миші по Y
 
-        # Події для додавання і перетягування блоків
         self.bind("<Double-1>", self.add_block)  # Подвійний клік для додавання блоку
         self.bind("<Button-1>", self.on_block_click)  # Натискання для вибору блоку
         self.bind("<B1-Motion>", self.on_block_drag)  # Перетягування блоку
