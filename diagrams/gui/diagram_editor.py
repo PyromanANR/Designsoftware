@@ -1,6 +1,10 @@
 import tkinter as tk
 from .block_options import BlockOptionsDialog
-from .blocks import AssignmentBlock, ConstantBlock, InputBlock, OutputBlock, ConditionBlock
+from .blocks.AssignmentBlock import AssignmentBlock
+from .blocks.ConstantBlock import ConstantBlock
+from .blocks.InputBlock import InputBlock
+from .blocks.OutputBlock import OutputBlock
+from .blocks.ConditionBlock import ConditionBlock
 from .diagram import Diagram
 
 class DiagramEditor(tk.Canvas):
@@ -57,7 +61,7 @@ class DiagramEditor(tk.Canvas):
         """Обробляє клік на блок для початку перетягування"""
         item = self.find_closest(event.x, event.y)  # Знаходимо найближчий елемент
         for block in self.diagram.blocks:
-            if block.rect_id == item[0]:  # Перевіряємо, чи це прямокутник блоку
+            if block.shape_id == item[0]:  # Перевіряємо, чи це прямокутник блоку
                 self.current_block = block
                 self.offset_x = event.x - block.x
                 self.offset_y = event.y - block.y
@@ -73,7 +77,7 @@ class DiagramEditor(tk.Canvas):
             # Рух прямокутника і тексту
             dx = new_x - self.current_block.x
             dy = new_y - self.current_block.y
-            self.move(self.current_block.rect_id, dx, dy)
+            self.move(self.current_block.shape_id, dx, dy)
             self.move(self.current_block.text_id, dx, dy)
 
             # Оновлення координат блоку
@@ -88,22 +92,22 @@ class DiagramEditor(tk.Canvas):
         """Показати контекстне меню біля блоку"""
         item = self.find_closest(event.x, event.y)  # Знайти найближчий елемент
         for block in self.diagram.blocks:
-            if block.rect_id == item[0]:  # Перевіряємо, чи це блок
+            if block.shape_id == item[0]:  # Перевіряємо, чи це блок
                 self.current_block = block
                 # Отримуємо поточний колір та зберігаємо його
-                original_fill = self.itemcget(block.rect_id, "fill")
+                original_fill = self.itemcget(block.shape_id, "fill")
                 # Робимо блок затемненим
-                self.itemconfig(block.rect_id, fill="gray")
+                self.itemconfig(block.shape_id, fill="gray")
                 self.context_menu.post(event.x_root, event.y_root)
                 # Повертаємо оригінальний колір
-                self.itemconfig(block.rect_id, fill=original_fill)
+                self.itemconfig(block.shape_id, fill=original_fill)
                 return
 
     def delete_block(self):
         """Видалити вибраний блок"""
         if self.current_block:
             # Видалення графічного представлення з Canvas
-            self.delete(self.current_block.rect_id)
+            self.delete(self.current_block.shape_id)
             self.delete(self.current_block.text_id)
             # Видалення блоку зі списку
             self.diagram.blocks.remove(self.current_block)
