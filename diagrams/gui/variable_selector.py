@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox, ttk
+from tkinter import messagebox, ttk
 
 class VariableSelector:
     def __init__(self, parent, shared_variables):

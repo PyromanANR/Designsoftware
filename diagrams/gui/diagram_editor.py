@@ -1,19 +1,7 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox, ttk
-from .block_options import BlockOptionsDialog, AssignmentBlock, ConstantBlock, InputBlock, OutputBlock, ConditionBlock
-from diagrams.gui.shared_variables import SharedVariables
-
-class Diagram:
-    def __init__(self):
-        self.blocks = []
-
-    def add_block(self, block):
-        self.blocks.append(block)
-
-    def render(self, canvas):
-        canvas.delete("all")
-        for block in self.blocks:
-            block.render(canvas)
+from .block_options import BlockOptionsDialog
+from .blocks import AssignmentBlock, ConstantBlock, InputBlock, OutputBlock, ConditionBlock
+from .diagram import Diagram
 
 class DiagramEditor(tk.Canvas):
     def __init__(self, parent, shared_variables):

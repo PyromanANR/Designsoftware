@@ -1,8 +1,7 @@
-#Головне вікно програми
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
-from diagrams.gui.diagram_editor import DiagramEditor
-from diagrams.gui.shared_variables import SharedVariables
+from .diagram_editor import DiagramEditor
+from .shared_variables import SharedVariables
 
 class MainWindow:
     def __init__(self):
