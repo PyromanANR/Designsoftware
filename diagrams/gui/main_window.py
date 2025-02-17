@@ -22,17 +22,26 @@ class MainWindow:
         open_button = tk.Button(command_frame, text="Open", command=self.open_file)
         open_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        exit_button = tk.Button(command_frame, text="Exit", command=self.exit_program)
-        exit_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
+        run_button = tk.Button(command_frame, text="Run", command=self.run_code)
+        run_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        exit_button = tk.Button(command_frame, text="New page", command=self.new_page)
-        exit_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        download_tests_button = tk.Button(command_frame, text="Download tests", command=self.download_tests)
+        download_tests_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
+
+        test_button = tk.Button(command_frame, text="Test", command=self.test)
+        test_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
+
+        exit_button = tk.Button(command_frame, text="Exit", command=self.exit_program)
+        exit_button.pack(side=tk.RIGHT, padx=5, pady=5, ipadx=8)
+
+        new_page_button = tk.Button(command_frame, text="New page", command=self.new_page)
+        new_page_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
         # Фрейм для управління змінними
         variable_frame = tk.Frame(self.root)
         variable_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
 
-        tk.Label(variable_frame, text="Shared Variables").pack()
+        tk.Label(variable_frame, text="Shared Variables:").pack()
 
         self.variable_listbox = tk.Listbox(variable_frame, height=15)
         self.variable_listbox.pack(fill=tk.BOTH, expand=True)
@@ -40,9 +49,9 @@ class MainWindow:
         btn_frame = tk.Frame(variable_frame)
         btn_frame.pack(fill=tk.X)
 
-        tk.Button(btn_frame, text="Add", command=self.add_variable).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        tk.Button(btn_frame, text="Edit", command=self.edit_variable).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        tk.Button(btn_frame, text="Delete", command=self.delete_variable).pack(side=tk.LEFT, fill=tk.X, expand=True)
+        tk.Button(btn_frame, text="Add", command=self.add_variable).pack(side=tk.LEFT, fill=tk.X, pady=10, expand=True)
+        tk.Button(btn_frame, text="Edit", command=self.edit_variable).pack(side=tk.LEFT, fill=tk.X, pady=10, expand=True)
+        tk.Button(btn_frame, text="Delete", command=self.delete_variable).pack(side=tk.LEFT, fill=tk.X, pady=10, expand=True)
 
         self.update_variable_list()
 
@@ -61,6 +70,18 @@ class MainWindow:
     def open_file(self):
         """Порожня функція для Open"""
         print("Open functionality is not implemented yet.")
+
+    def run_code(self):
+        """Порожня функція для Open"""
+        print("Run code functionality is not implemented yet.")
+
+    def download_tests(self):
+        """Порожня функція для Open"""
+        print("Download tests functionality is not implemented yet.")
+
+    def test(self):
+        """Порожня функція для Open"""
+        print("Test functionality is not implemented yet.")
 
     def exit_program(self):
         """Підтвердження перед закриттям програми"""
