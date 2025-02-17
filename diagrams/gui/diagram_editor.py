@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox, ttk
 from .block_options import BlockOptionsDialog, AssignmentBlock, ConstantBlock, InputBlock, OutputBlock, ConditionBlock
+from diagrams.gui.shared_variables import SharedVariables
 
 class Diagram:
     def __init__(self):
@@ -15,9 +16,10 @@ class Diagram:
             block.render(canvas)
 
 class DiagramEditor(tk.Canvas):
-    def __init__(self, parent):
+    def __init__(self, parent, shared_variables):
         super().__init__(parent, bg="white", width=600, height=400)
         self.pack(fill=tk.BOTH, expand=True)
+        self.shared_variables = shared_variables
         self.diagram = Diagram()
 
         self.current_block = None  # Поточний блок, який перетягують
@@ -39,30 +41,26 @@ class DiagramEditor(tk.Canvas):
         block_id = len(self.diagram.blocks) + 1
         dialog = BlockOptionsDialog(self, title="Select Block Type")
         block_type = dialog.selected_option
-        if block_type is None:  # Якщо користувач закрив діалогове вікно
+        if block_type is None:
             return
 
-        if block_type == "Assignment (V1 = V2)":
-            var1 = simpledialog.askstring("Input", "Enter variable 1:", parent=self)
-            var2 = simpledialog.askstring("Input", "Enter variable 2:", parent=self)
-            block = AssignmentBlock(block_id, event.x, event.y, var1, var2)
-        elif block_type == "Constant (V = C)":
-            var = simpledialog.askstring("Input", "Enter variable:", parent=self)
-            value = simpledialog.askstring("Input", "Enter value:", parent=self)
-            block = ConstantBlock(block_id, event.x, event.y, var, value)
-        elif block_type == "Input (INPUT V)":
-            var = simpledialog.askstring("Input", "Enter variable:", parent=self)
-            block = InputBlock(block_id, event.x, event.y, var)
-        elif block_type == "Output (PRINT V)":
-            var = simpledialog.askstring("Input", "Enter variable:", parent=self)
-            block = OutputBlock(block_id, event.x, event.y, var)
-        elif "Condition" in block_type:
-            var = simpledialog.askstring("Input", "Enter variable:", parent=self)
-            value = simpledialog.askstring("Input", "Enter value:", parent=self)
-            condition = "==" if "==" in block_type else "<"
-            block = ConditionBlock(block_id, event.x, event.y, var, value, condition)
-        else:
-            return
+        try:
+            if block_type == "Assignment (V1 = V2)":
+                block = AssignmentBlock(block_id, event.x, event.y, self.shared_variables, self)
+            elif block_type == "Constant (V = C)":
+                block = ConstantBlock(block_id, event.x, event.y, self.shared_variables, self)
+            elif block_type == "Input (INPUT V)":
+                block = InputBlock(block_id, event.x, event.y, self.shared_variables, self)
+            elif block_type == "Output (PRINT V)":
+                block = OutputBlock(block_id, event.x, event.y, self.shared_variables, self)
+            elif block_type == "Condition (V == C)":
+                block = ConditionBlock(block_id, event.x, event.y, self.shared_variables, self, "==")
+            elif block_type == "Condition (V < C)":
+                block = ConditionBlock(block_id, event.x, event.y, self.shared_variables, self, "<")
+            else:
+                return
+        except ValueError:
+            return  # Якщо вибір змінної чи значення було скасовано, блок не додається
 
         self.diagram.add_block(block)
         self.diagram.render(self)
