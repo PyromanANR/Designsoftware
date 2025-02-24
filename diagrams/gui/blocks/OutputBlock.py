@@ -5,10 +5,10 @@ class OutputBlock(Block):
     def __init__(self, block_id, x, y, shared_variables, parent):
         super().__init__(block_id, x, y, shared_variables, parent)
         selector = VariableSelector(parent, shared_variables)
-        self.var = selector.select_variable("Select Variable")
+        self.var = selector.select_variable("Виберіть змінну")
 
         if not self.var:
-            raise ValueError("Variable selection was canceled")
+            raise ValueError("Вибір змінної скасовано")
 
     def render(self, canvas):
         offset, width, height = 20, 200, 50

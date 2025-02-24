@@ -5,6 +5,7 @@ from .blocks.ConstantBlock import ConstantBlock
 from .blocks.InputBlock import InputBlock
 from .blocks.OutputBlock import OutputBlock
 from .blocks.ConditionBlock import ConditionBlock
+from .blocks.EndBlock import EndBlock
 from .diagram import Diagram
 
 class DiagramEditor(tk.Canvas):
@@ -31,7 +32,7 @@ class DiagramEditor(tk.Canvas):
     def add_block(self, event):
         """Додає блок з вибором типу після кліку"""
         block_id = len(self.diagram.blocks) + 1
-        dialog = BlockOptionsDialog(self, title="Select Block Type")
+        dialog = BlockOptionsDialog(self, title="Виберіть тип блоку")
         block_type = dialog.selected_option
         if block_type is None:
             return
@@ -49,6 +50,8 @@ class DiagramEditor(tk.Canvas):
                 block = ConditionBlock(block_id, event.x, event.y, self.shared_variables, self, "==")
             elif block_type == "Condition (V < C)":
                 block = ConditionBlock(block_id, event.x, event.y, self.shared_variables, self, "<")
+            elif block_type == "End":
+                block = EndBlock(block_id, event.x, event.y, self.shared_variables, self)
             else:
                 return
         except ValueError:

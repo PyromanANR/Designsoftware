@@ -11,14 +11,14 @@ class ConditionBlock(Block):
         selector = VariableSelector(parent, shared_variables)
 
         # Вибір змінної
-        self.var = selector.select_variable("Select Variable")
+        self.var = selector.select_variable("Виберіть змінну")
         if not self.var:
-            raise ValueError("Variable selection was canceled")
+            raise ValueError("Вибір змінної скасовано")
 
         # Вибір значення константи
-        self.value = simpledialog.askinteger("Input Value", "Enter a constant value:", parent=parent)
+        self.value = simpledialog.askinteger("Вхідне значення", "Введіть константне значення:", parent=parent)
         if self.value is None:
-            raise ValueError("Constant value selection was canceled")
+            raise ValueError("Скасовано введення константи")
 
         self.condition = condition_type
 
