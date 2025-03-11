@@ -1,0 +1,50 @@
+{
+  "name": "Diagram_1",
+  "blocks": [
+    {
+      "id": 1,
+      "type": "StartBlock",
+      "x": 100,
+      "y": 50,
+      "text": "Start",
+      "connections": [{"to": 2}]
+    },
+    {
+      "id": 2,
+      "type": "ConstantBlock",
+      "x": 100,
+      "y": 150,
+      "text": "y = 10",
+      "connections": [{"to": 3}]
+    },
+    {
+      "id": 3,
+      "type": "AssignmentBlock",
+      "x": 100,
+      "y": 250,
+      "text": "x = y",
+      "connections": [{"to": 4}]
+    },
+    {
+      "id": 4,
+      "type": "PrintBlock",
+      "x": 100,
+      "y": 350,
+      "text": "PRINT x",
+      "connections": [{"to": 5}]
+    },
+    {
+      "id": 5,
+      "type": "EndBlock",
+      "x": 100,
+      "y": 450,
+      "text": "End",
+      "connections": []
+    }
+  ],
+  "shared_variables": {
+    "x": 12,
+    "y": 0,
+    "z": 120
+  }
+}

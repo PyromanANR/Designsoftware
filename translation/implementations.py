@@ -1,6 +1,6 @@
-from block import Block 
+from block import Block
 
-class BeginBlock(Block):
+class StartBlock(Block):
     def generate_code(self):
         return "# Початок виконання"
 
@@ -9,14 +9,22 @@ class EndBlock(Block):
         return "# Кінець виконання"
 
 class AssignmentBlock(Block):
-    def __init__(self, block_id, var1, var2=None, value=None):
+    def __init__(self, block_id, var1, var2):
         super().__init__(block_id)
         self.var1 = var1
         self.var2 = var2
+
+    def generate_code(self):
+        return f"{self.var1} = {self.var2}"
+    
+class ConstantBlock(Block):
+    def __init__(self, block_id, var, value):
+        super().__init__(block_id)
+        self.var = var
         self.value = value
 
     def generate_code(self):
-        return f"{self.var1} = {self.var2 if self.var2 else self.value}"
+        return f"{self.var} = {self.value}"
 
 class InputBlock(Block):
     def __init__(self, block_id, var):
@@ -35,11 +43,13 @@ class PrintBlock(Block):
         return f"print('{self.var} =', {self.var})"
 
 class ConditionBlock(Block):
-    def __init__(self, block_id, var, condition, value):
+    def __init__(self, block_id, var, condition, value, yes_branch=None, no_branch=None):
         super().__init__(block_id)
         self.var = var
         self.condition = condition
         self.value = value
+        self.yes_branch = yes_branch  # ID of the block for "так"
+        self.no_branch = no_branch  # ID of the block for "ні"
 
     def generate_code(self):
         return f"if {self.var} {self.condition} {self.value}:"
