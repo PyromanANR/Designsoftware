@@ -22,10 +22,10 @@
         "type": "ConditionBlock",
         "x": 100,
         "y": 250,
-        "text": "y < 3",
+        "text": "y < 5",
         "connections": [
           {"to": 4, "condition": "так"},
-          {"to": 6, "condition": "ні"}
+          {"to": 5, "condition": "ні"}
         ]
       },
       {
@@ -34,21 +34,29 @@
         "x": 250,
         "y": 350,
         "text": "PRINT y",
-        "connections": [{"to": 5}]
+        "connections": [{"to": 6}]
       },
       {
         "id": 5,
-        "type": "AssignmentBlock",
+        "type": "PrintBlock",
         "x": 250,
         "y": 450,
-        "text": "y = 6",
-        "connections": [{"to": 3}]
+        "text": "PRINT x",
+        "connections": [{"to": 6}]
       },
       {
         "id": 6,
-        "type": "EndBlock",
+        "type": "InputBlock",
         "x": 100,
         "y": 550,
+        "text": "INPUT x",
+        "connections": [{"to": 3}, {"to": 6}]
+      },
+      {
+        "id": 7,
+        "type": "EndBlock",
+        "x": 100,
+        "y": 650,
         "text": "End",
         "connections": []
       }
