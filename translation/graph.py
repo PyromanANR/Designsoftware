@@ -10,20 +10,17 @@ class Graph:
 
     def build_from_json(self, thread_data):
         """Створює граф з JSON-даних потоку."""
-        # Додаємо блоки
         for block_data in thread_data["blocks"]:
             block = BlockFactory.create_block(block_data)
             self.add_block(block)
 
-        # Додаємо з'єднання
         for block_data in thread_data["blocks"]:
             block_id = block_data["id"]
             for connection in block_data.get("connections", []):
                 to_id = connection["to"]
-                condition = connection.get("condition")  # Умова (якщо є)
+                condition = connection.get("condition")
                 self.add_connection(block_id, to_id, condition)
 
-                # Оновлення умов для ConditionBlock
                 block = self.blocks.get(block_id)
                 if isinstance(block, ConditionBlock):
                     if condition == "так":
@@ -43,18 +40,24 @@ class Graph:
         self.connections[from_id].append((to_id, condition))
 
     def generate_code(self):
-        """Генерує Python-код з урахуванням умов і циклів."""
+        """Генерує Python-код у послідовному порядку без циклів."""
         code_lines = []
-        visited = set()
+        queue = []
+        processed = set()
 
-        def dfs(block_id, indent_level=0):
-            """Обхід графа в глибину для генерації коду."""
-            if block_id in visited:
-                return
-            visited.add(block_id)
+        start_block = next((b for b in self.blocks.values() if isinstance(b, StartBlock)), None)
+        if start_block:
+            queue.append(start_block.block_id)
+
+        after_condition_blocks = set()
+
+        while queue:
+            block_id = queue.pop(0)
+            if block_id in processed:
+                continue
+            processed.add(block_id)
 
             block = self.blocks[block_id]
-            indentation = "    " * indent_level
             next_blocks = self.connections.get(block_id, [])
 
             if isinstance(block, ConditionBlock):
@@ -62,35 +65,31 @@ class Graph:
                 yes_block = block.yes_branch
                 no_block = block.no_branch
 
-                # Вставляємо умову
-                code_lines.append(f"{indentation}if {condition}:")
+                code_lines.append(f"if {condition}:")
                 if yes_block:
-                    dfs(yes_block, indent_level + 1)
-
+                    code_lines.append(f"    {self.blocks[yes_block].generate_code()}")
+                    queue.append(yes_block)
+                    after_condition_blocks.add(yes_block)
+                
+                code_lines.append("else:")
                 if no_block:
-                    code_lines.append(f"{indentation}else:")
-                    dfs(no_block, indent_level + 1)
-
-                # Handle blocks that come after both branches
-                yes_next = {b[0] for b in self.connections.get(yes_block, [])}
-                no_next = {b[0] for b in self.connections.get(no_block, [])}
-                common_blocks = yes_next.intersection(no_next)
-
-                for block in common_blocks:
-                    if block not in visited:
-                        dfs(block, indent_level)
-
+                    code_lines.append(f"    {self.blocks[no_block].generate_code()}")
+                    queue.append(no_block)
+                    after_condition_blocks.add(no_block)
+                
+                # Ensure only the next unique block after both branches executes
+                common_next = set()
+                if yes_block and no_block:
+                    yes_next = {b[0] for b in self.connections.get(yes_block, [])}
+                    no_next = {b[0] for b in self.connections.get(no_block, [])}
+                    common_next = yes_next.intersection(no_next)
+                
+                for next_block in common_next:
+                    queue.append(next_block)
             else:
-                # Виконання звичайних блоків
-                code_lines.append(f"{indentation}{block.generate_code()}")
-
-                # Виконання наступного блоку
+                if block_id not in after_condition_blocks:
+                    code_lines.append(block.generate_code())
                 for next_block, _ in next_blocks:
-                    dfs(next_block, indent_level)
-
-        # Починаємо з блоку початку
-        start_block = next((b for b in self.blocks.values() if isinstance(b, StartBlock)), None)
-        if start_block:
-            dfs(start_block.block_id)
+                    queue.append(next_block)
 
         return "\n".join(code_lines)
