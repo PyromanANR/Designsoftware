@@ -39,7 +39,7 @@
       {
         "id": 5,
         "type": "PrintBlock",
-        "x": 250,
+        "x": 250, 
         "y": 450,
         "text": "PRINT x",
         "connections": [{"to": 6}]
