@@ -1,9 +1,6 @@
 from factory import BlockFactory
 from implementations import StartBlock, ConditionBlock
 
-from factory import BlockFactory
-from implementations import StartBlock, ConditionBlock
-
 class Graph:
     """Граф для представлення потоку виконання блок-схеми."""
 

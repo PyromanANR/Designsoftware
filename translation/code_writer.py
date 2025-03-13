@@ -11,7 +11,7 @@ class Writer:
     def write_code(self, threads, shared_vars):
         """Записує згенерований код усіх потоків у один файл."""
         with open(self.filepath, "w", encoding="utf-8") as file:
-            file.write("import threading\n\n")  # Import threading module
+            file.write("import threading\n\n")  
             file.write("# Автоматично згенерований код\n\n")
             
             # Записуємо спільні змінні
@@ -26,7 +26,7 @@ class Writer:
             # Записуємо функції для потоків
             for thread in threads:
                 file.write(f"def thread_{thread.thread_id}():\n")
-                file.write(f"    with lock:\n")  # Only one 'with lock:' per function
+                file.write(f"    with lock:\n")  
 
                 thread_code = thread.get_code().split("\n")
 

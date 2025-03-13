@@ -48,8 +48,8 @@ class ConditionBlock(Block):
         self.var = var
         self.condition = condition
         self.value = value
-        self.yes_branch = yes_branch  # ID of the block for "так"
-        self.no_branch = no_branch  # ID of the block for "ні"
+        self.yes_branch = yes_branch  
+        self.no_branch = no_branch 
 
     def generate_code(self):
         return f"if {self.var} {self.condition} {self.value}:"
