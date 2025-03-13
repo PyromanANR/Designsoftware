@@ -66,7 +66,7 @@ class Graph:
         return loops
 
     def generate_code(self):
-        """Генерує Python-код у послідовному порядку з підтримкою циклів."""
+        """Генерує Python-код у послідовному порядку з підтримкою циклів та унікальних блоків після if."""
         code_lines = []
         queue = []
         processed = set()
@@ -76,9 +76,16 @@ class Graph:
         if start_block:
             queue.append(start_block.block_id)
 
-        after_condition_blocks = set()
         inside_loop = False
         indent_level = 0
+        loop_blocks = set()
+        unique_blocks_after_if = set()
+
+        # Identify all blocks that are part of a loop
+        for block_id in loops:
+            loop_blocks.add(block_id)
+            for next_block, _ in self.connections.get(block_id, []):
+                loop_blocks.add(next_block)
 
         while queue:
             block_id = queue.pop(0)
@@ -89,47 +96,64 @@ class Graph:
             block = self.blocks[block_id]
             next_blocks = self.connections.get(block_id, [])
 
+            # If entering a loop, add 'while True:' and increase indentation
             if block_id in loops and not inside_loop:
                 code_lines.append("while True:")
                 inside_loop = True
-                indent_level = 1  # Start indentation for looped blocks
+                indent_level += 1
 
-            indent = "    " * indent_level  # Apply proper indentation
+            indent = "    " * indent_level  # Apply correct indentation
 
+            # Handle conditional blocks
             if isinstance(block, ConditionBlock):
                 condition = f"{block.var} {block.condition} {block.value}"
                 yes_block = block.yes_branch
                 no_block = block.no_branch
 
+                # IF condition
                 code_lines.append(f"{indent}if {condition}:")
+                indent_level += 1  # Increase indentation inside IF block
+
                 if yes_block:
-                    code_lines.append(f"{indent}    {self.blocks[yes_block].generate_code()}")
                     queue.append(yes_block)
-                    after_condition_blocks.add(yes_block)
-                
-                code_lines.append(f"{indent}else:")
+                    code_lines.append(f"{'    ' * indent_level}{self.blocks[yes_block].generate_code()}")
+                    unique_blocks_after_if.add(yes_block)  # Mark for unique execution
+
+                indent_level -= 1  # Reset after IF
+
+                # ELSE condition (if exists)
                 if no_block:
-                    code_lines.append(f"{indent}    {self.blocks[no_block].generate_code()}")
+                    code_lines.append(f"{indent}else:")
+                    indent_level += 1  # Increase indentation inside ELSE block
                     queue.append(no_block)
-                    after_condition_blocks.add(no_block)
-                
+                    code_lines.append(f"{'    ' * indent_level}{self.blocks[no_block].generate_code()}")
+                    unique_blocks_after_if.add(no_block)  # Mark for unique execution
+                    indent_level -= 1  # Reset after ELSE
+
+                # Find blocks that come **after both IF and ELSE** (common blocks)
                 common_next = set()
                 if yes_block and no_block:
                     yes_next = {b[0] for b in self.connections.get(yes_block, [])}
                     no_next = {b[0] for b in self.connections.get(no_block, [])}
                     common_next = yes_next.intersection(no_next)
-                
+
+                # Ensure common blocks only appear **once** after IF-ELSE
                 for next_block in common_next:
-                    queue.append(next_block)
+                    if next_block not in unique_blocks_after_if:
+                        queue.append(next_block)
+
             else:
-                if block_id not in after_condition_blocks:
+                # Generate normal block code
+                if block_id not in unique_blocks_after_if:
                     code_lines.append(f"{indent}{block.generate_code()}")
+
+                # Add next blocks to the queue
                 for next_block, _ in next_blocks:
                     queue.append(next_block)
 
-            # If we exit the loop, reset indentation
-            if block_id in loops and inside_loop:
+            # If exiting the loop, reset indentation
+            if block_id in loops and all(nb not in loop_blocks for nb, _ in next_blocks):
                 inside_loop = False
-                indent_level = 0  # Reset indentation after loop
+                indent_level -= 1
 
         return "\n".join(code_lines)
