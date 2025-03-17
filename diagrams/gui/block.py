@@ -1,4 +1,3 @@
-# === Базовий клас для блоків ===
 class Block:
     def __init__(self, block_id, x, y, shared_variables, parent):
         self.block_id = block_id

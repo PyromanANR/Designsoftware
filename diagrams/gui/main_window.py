@@ -1,10 +1,10 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, messagebox, simpledialog, filedialog
 from .diagram_editor import DiagramEditor
 from .shared_variables import SharedVariables
 from .blocks.StartBlock import StartBlock
 import json
-from tkinter import filedialog
+from .diagram import Diagram
 
 class MainWindow:
     def __init__(self):
@@ -83,8 +83,22 @@ class MainWindow:
                             json.dump(diagram.to_dict(), file, indent=4, ensure_ascii=False)
 
     def open_file(self):
-        """Порожня функція для Open"""
-        print("Open functionality is not implemented yet.")
+        filename = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
+        if not filename:
+            return
+
+        with open(filename, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        tab = ttk.Frame(self.tabs)
+        diagram_name = data["name"]
+        self.tabs.add(tab, text=diagram_name)
+        editor = DiagramEditor(tab, self.shared_variables, diagram_name)
+        editor.pack(fill=tk.BOTH, expand=True)
+        editor.diagram.load_from_dict(data, editor)
+        editor.diagram.render(editor)
+
+        self.update_variable_list()  # Оновити панель змінних
 
     def run_code(self):
         """Порожня функція для Open"""
