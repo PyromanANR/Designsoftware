@@ -3,6 +3,8 @@ from tkinter import ttk, messagebox, simpledialog
 from .diagram_editor import DiagramEditor
 from .shared_variables import SharedVariables
 from .blocks.StartBlock import StartBlock
+import json
+from tkinter import filedialog
 
 class MainWindow:
     def __init__(self):
@@ -65,8 +67,20 @@ class MainWindow:
         self.new_page()
 
     def save(self):
-        """Порожня функція для Save"""
-        print("Save functionality is not implemented yet.")
+        """Зберігає всі діаграми у JSON-файли."""
+        for i, tab in enumerate(self.tabs.winfo_children()):
+            # Отримуємо об'єкт DiagramEditor з вкладки
+            for widget in tab.winfo_children():
+                if isinstance(widget, DiagramEditor):
+                    diagram = widget.diagram
+                    filename = filedialog.asksaveasfilename(
+                        defaultextension=".json",
+                        filetypes=[("JSON Files", "*.json")],
+                        initialfile=f"{diagram.name}.json"
+                    )
+                    if filename:
+                        with open(filename, "w", encoding="utf-8") as file:
+                            json.dump(diagram.to_dict(), file, indent=4, ensure_ascii=False)
 
     def open_file(self):
         """Порожня функція для Open"""
@@ -100,10 +114,11 @@ class MainWindow:
         """Додати нову вкладку для потоку та автоматично додає блок Початок"""
         self.page_count += 1
         tab = ttk.Frame(self.tabs)
-        self.tabs.add(tab, text=f"Page {self.page_count}")
+        diagram_name = f"Diagram_{self.page_count}"
+        self.tabs.add(tab, text=diagram_name)
 
         # Полотно для блок-схеми
-        editor = DiagramEditor(tab, self.shared_variables)
+        editor = DiagramEditor(tab, self.shared_variables, diagram_name)
         editor.pack(fill=tk.BOTH, expand=True)
 
         # Додаємо блок "Початок" автоматично

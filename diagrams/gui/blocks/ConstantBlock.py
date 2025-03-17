@@ -17,6 +17,8 @@ class ConstantBlock(Block):
         if self.value is None:  # Якщо користувач скасував введення
             raise ValueError("Скасовано введення константи")
 
+        self.text = f"{self.var} = {self.value}"
+
     def render(self, canvas):
         self.shape_id = canvas.create_rectangle(self.x, self.y, self.x + 200, self.y + 50, fill="white", tags=f"block_{self.block_id}")
-        self.text_id = canvas.create_text(self.x + 100, self.y + 25, text=f"{self.var} = {self.value}", tags=f"block_{self.block_id}")
+        self.text_id = canvas.create_text(self.x + 100, self.y + 25, text=self.text, tags=f"block_{self.block_id}")

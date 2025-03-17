@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk, messagebox
 from .block_options import BlockOptionsDialog
 from .blocks.AssignmentBlock import AssignmentBlock
 from .blocks.ConstantBlock import ConstantBlock
@@ -6,14 +7,16 @@ from .blocks.InputBlock import InputBlock
 from .blocks.OutputBlock import OutputBlock
 from .blocks.ConditionBlock import ConditionBlock
 from .blocks.EndBlock import EndBlock
+from .blocks.StartBlock import StartBlock
 from .diagram import Diagram
 
 class DiagramEditor(tk.Canvas):
-    def __init__(self, parent, shared_variables):
+    def __init__(self, parent, shared_variables, diagram_name):
         super().__init__(parent, bg="white", width=600, height=400)
         self.pack(fill=tk.BOTH, expand=True)
         self.shared_variables = shared_variables
-        self.diagram = Diagram()
+        self.diagram = Diagram(diagram_name, shared_variables)
+        self.selected_block_for_link = None  # Блок для з'єднання
 
         self.current_block = None  # Поточний блок, який перетягують
         self.offset_x = 0  # Зміщення миші по X
@@ -28,6 +31,7 @@ class DiagramEditor(tk.Canvas):
         # Контекстне меню
         self.context_menu = tk.Menu(self, tearoff=0)
         self.context_menu.add_command(label="Видалити", command=self.delete_block)
+        self.context_menu.add_command(label="З'єднати", command=self.connect_blocks_dialog)
 
     def add_block(self, event):
         """Додає блок з вибором типу після кліку"""
@@ -115,3 +119,97 @@ class DiagramEditor(tk.Canvas):
             # Видалення блоку зі списку
             self.diagram.blocks.remove(self.current_block)
             self.current_block = None
+
+    def connect_blocks_dialog(self):
+        """Відкриває діалогове вікно з випадаючими списками для вибору блоків."""
+        if self.current_block is None:
+            return
+
+        if isinstance(self.current_block, EndBlock):
+            messagebox.showwarning("Помилка", "Блок 'Кінець' не може мати наступних блоків.")
+            return
+
+        available_blocks = [b for b in self.diagram.blocks if b != self.current_block and not isinstance(b, StartBlock)]
+        if not available_blocks:
+            messagebox.showwarning("Помилка", "Немає доступних блоків для з'єднання.")
+            return
+
+        dialog = tk.Toplevel(self)
+        dialog.title("Вибір блоку для з'єднання")
+        dialog.geometry("300x200")
+
+        if isinstance(self.current_block, ConditionBlock):
+            # Для блоків if – два випадаючі списки
+            tk.Label(dialog, text="Оберіть блок для 'Так':").pack(pady=5)
+            block_yes_var = tk.StringVar()
+            block_yes_dropdown = ttk.Combobox(dialog, textvariable=block_yes_var, state="readonly",
+                                              values=[b.text for b in available_blocks])
+            block_yes_dropdown.pack(pady=5)
+
+            tk.Label(dialog, text="Оберіть блок для 'Ні':").pack(pady=5)
+            block_no_var = tk.StringVar()
+            block_no_dropdown = ttk.Combobox(dialog, textvariable=block_no_var, state="readonly",
+                                             values=[b.text for b in available_blocks])
+            block_no_dropdown.pack(pady=5)
+
+        else:
+            # Для всіх інших блоків – один випадаючий список
+            tk.Label(dialog, text="Оберіть блок для з'єднання:").pack(pady=5)
+            block_var = tk.StringVar()
+            block_dropdown = ttk.Combobox(dialog, textvariable=block_var, state="readonly",
+                                          values=[b.text for b in available_blocks])
+            block_dropdown.pack(pady=5)
+
+        def confirm_connection():
+            """Обробляє підтвердження вибору блоку для з'єднання."""
+            if isinstance(self.current_block, ConditionBlock):
+                block_yes = next((b for b in available_blocks if b.text == block_yes_var.get()), None)
+                block_no = next((b for b in available_blocks if b.text == block_no_var.get()), None)
+
+                if not block_yes or not block_no or block_yes == block_no:
+                    messagebox.showwarning("Помилка", "Для умовного блоку потрібно вибрати два різні блоки.")
+                    return
+
+                self.current_block.add_next_block(block_yes, "так")
+                self.current_block.add_next_block(block_no, "ні")
+
+                # ✅ Змінюємо колір блоку для "так" на зелений
+                self.itemconfig(block_yes.shape_id, fill="lightgreen")
+                # ❌ Змінюємо колір блоку для "ні" на червоний
+                self.itemconfig(block_no.shape_id, fill="lightcoral")
+
+            else:
+                selected_block = next((b for b in available_blocks if b.text == block_var.get()), None)
+                if selected_block:
+                    self.current_block.add_next_block(selected_block)
+
+            self.redraw_connections()
+            dialog.destroy()
+
+        tk.Button(dialog, text="З'єднати", command=confirm_connection).pack(pady=10)
+
+    def redraw_connections(self):
+        """Перемальовує всі зв’язки між блоками."""
+        self.delete("connection")
+        for block in self.diagram.blocks:
+            for next_block in block.next_blocks:
+                if isinstance(next_block, tuple):  # Якщо це умовний зв'язок
+                    target_block, condition = next_block
+                else:
+                    target_block = next_block
+                    condition = None
+
+                self.create_line(block.x + 100, block.y + 50,
+                                 target_block.x + 100, target_block.y,
+                                 arrow=tk.LAST, tags="connection")
+
+        # Оновлюємо кольори всіх блоків після перерисування
+        for block in self.diagram.blocks:
+            if isinstance(block, ConditionBlock):
+                for next_block in block.next_blocks:
+                    if isinstance(next_block, tuple):  # Для умовних блоків
+                        target_block, condition = next_block
+                        if condition == "так":
+                            self.itemconfig(target_block.shape_id, fill="lightgreen")
+                        elif condition == "ні":
+                            self.itemconfig(target_block.shape_id, fill="lightcoral")

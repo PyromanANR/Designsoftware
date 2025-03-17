@@ -10,6 +10,8 @@ class OutputBlock(Block):
         if not self.var:
             raise ValueError("Вибір змінної скасовано")
 
+        self.text = f"PRINT {self.var}"
+
     def render(self, canvas):
         offset, width, height = 20, 200, 50
         self.shape_id = canvas.create_polygon(
@@ -22,6 +24,6 @@ class OutputBlock(Block):
         )
         self.text_id = canvas.create_text(
             self.x + offset / 2 + width / 2, self.y + height / 2,
-            text=f"PRINT {self.var}",
+            text=self.text,
             tags=f"block_{self.block_id}"
         )

@@ -21,6 +21,7 @@ class ConditionBlock(Block):
             raise ValueError("Скасовано введення константи")
 
         self.condition = condition_type
+        self.text = f"{self.var} {self.condition} {self.value}"
 
     def render(self, canvas):
         width, height = 200, 50
@@ -38,6 +39,6 @@ class ConditionBlock(Block):
         )
         self.text_id = canvas.create_text(
             self.x + width / 2, self.y + height / 2,
-            text=f"{self.var} {self.condition} {self.value}",
+            text=self.text,
             tags=f"block_{self.block_id}"
         )
