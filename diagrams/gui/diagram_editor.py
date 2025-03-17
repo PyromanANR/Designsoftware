@@ -91,6 +91,8 @@ class DiagramEditor(tk.Canvas):
             self.current_block.x = new_x
             self.current_block.y = new_y
 
+            self.redraw_connections()  # оновлення стрілок
+
     def on_block_release(self, event):
         """Завершення перетягування блоку"""
         self.current_block = None
@@ -194,10 +196,9 @@ class DiagramEditor(tk.Canvas):
         for block in self.diagram.blocks:
             for next_block in block.next_blocks:
                 if isinstance(next_block, tuple):  # Якщо це умовний зв'язок
-                    target_block, condition = next_block
+                    target_block, _ = next_block
                 else:
                     target_block = next_block
-                    condition = None
 
                 self.create_line(block.x + 100, block.y + 50,
                                  target_block.x + 100, target_block.y,
