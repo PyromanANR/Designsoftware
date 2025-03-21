@@ -6,12 +6,12 @@ class VariableSelector:
         self.parent = parent
         self.shared_variables = shared_variables
 
-    def select_variable(self, title="Select Variable"):
+    def select_variable(self, title="Виберіть змінну"):
         """Вибір змінної з існуючих у списку"""
         variables = self.shared_variables.get_variables()
 
         if not variables:
-            messagebox.showerror("No Variables", "Please create at least one shared variable before using this block.")
+            messagebox.showerror("Ще немає створених змінних", "Будь ласка, створіть принаймні одну спільну змінну перед використанням цього блоку.")
             return None
 
         return self._show_selection_window(title, list(variables.keys()))
@@ -21,15 +21,15 @@ class VariableSelector:
         variables = self.shared_variables.get_variables()
 
         if len(variables) < 2:
-            messagebox.showerror("Not Enough Variables", "Please create at least two shared variables before using this block.")
+            messagebox.showerror("Недостатньо змінних", "Будь ласка, створіть принаймні дві спільні змінні перед використанням цього блоку.")
             return None, None
 
-        var1 = self._show_selection_window("Select Variable 1", list(variables.keys()))
-        var2 = self._show_selection_window("Select Variable 2", list(variables.keys()))
+        var1 = self._show_selection_window("Виберіть Змінну 1", list(variables.keys()))
+        var2 = self._show_selection_window("Виберіть Змінну 2", list(variables.keys()))
 
         while var1 == var2:  # Забороняємо вибирати одну і ту ж змінну двічі
-            messagebox.showerror("Duplicate Variable", "Please select two different variables.")
-            var2 = self._show_selection_window("Select Variable 2", list(variables.keys()))
+            messagebox.showerror("Дублююча змінна", "Будь ласка, оберіть дві різні змінні.")
+            var2 = self._show_selection_window("Виберіть Змінну 2", list(variables.keys()))
 
         return var1, var2
 
@@ -38,7 +38,7 @@ class VariableSelector:
         var_window = tk.Toplevel(self.parent)
         var_window.title(title)
 
-        tk.Label(var_window, text="Select a variable:").pack(padx=10, pady=5)
+        tk.Label(var_window, text="Виберіть змінну:").pack(padx=10, pady=5)
 
         var_choice = tk.StringVar()
         var_combobox = ttk.Combobox(var_window, textvariable=var_choice, values=variable_list, state="readonly")

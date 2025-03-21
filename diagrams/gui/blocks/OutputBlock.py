@@ -5,10 +5,12 @@ class OutputBlock(Block):
     def __init__(self, block_id, x, y, shared_variables, parent):
         super().__init__(block_id, x, y, shared_variables, parent)
         selector = VariableSelector(parent, shared_variables)
-        self.var = selector.select_variable("Select Variable")
+        self.var = selector.select_variable("Виберіть змінну")
 
         if not self.var:
-            raise ValueError("Variable selection was canceled")
+            raise ValueError("Вибір змінної скасовано")
+
+        self.text = f"PRINT {self.var}"
 
     def render(self, canvas):
         offset, width, height = 20, 200, 50
@@ -22,6 +24,6 @@ class OutputBlock(Block):
         )
         self.text_id = canvas.create_text(
             self.x + offset / 2 + width / 2, self.y + height / 2,
-            text=f"PRINT {self.var}",
+            text=self.text,
             tags=f"block_{self.block_id}"
         )

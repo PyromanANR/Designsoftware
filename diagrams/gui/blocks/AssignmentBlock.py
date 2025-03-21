@@ -8,8 +8,10 @@ class AssignmentBlock(Block):
         self.var1, self.var2 = selector.select_two_variables()
 
         if not self.var1 or not self.var2:
-            raise ValueError("Variable selection was canceled")
+            raise ValueError("Вибір змінної скасовано")
+
+        self.text = f"{self.var1} = {self.var2}"
 
     def render(self, canvas):
         self.shape_id = canvas.create_rectangle(self.x, self.y, self.x + 200, self.y + 50, fill="white", tags=f"block_{self.block_id}")
-        self.text_id = canvas.create_text(self.x + 100, self.y + 25, text=f"{self.var1} = {self.var2}", tags=f"block_{self.block_id}")
+        self.text_id = canvas.create_text(self.x + 100, self.y + 25, text=self.text, tags=f"block_{self.block_id}")
