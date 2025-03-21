@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog, filedialog
 from .diagram_editor import DiagramEditor
 from .shared_variables import SharedVariables
+from testing.code_runner import CodeRunner
+from testing.test_manager import TestManager
+from testing.tester import Tester
 from .blocks.StartBlock import StartBlock
 import json
 from .diagram import Diagram
@@ -11,11 +14,15 @@ class MainWindow:
         self.root = tk.Tk()
         self.root.title("Багатопотоковий редактор блок-схем")
         self.root.geometry("800x600")
+        self.code_runner = CodeRunner()
+        self.test_manager = TestManager()
+        self.tester = Tester()
         self.shared_variables = SharedVariables(self.update_variable_list)
         self.init_ui()
 
     def init_ui(self):
         # Рядок команд
+
         command_frame = tk.Frame(self.root)
         command_frame.pack(side=tk.TOP, fill=tk.X)
 
@@ -28,10 +35,8 @@ class MainWindow:
         run_button = tk.Button(command_frame, text="Запустити", command=self.run_code)
         run_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
-        download_tests_button = tk.Button(command_frame, text="Завантажити тести", command=self.download_tests)
-        download_tests_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
+        test_button = tk.Button(command_frame, text="Test", command=self.test)
 
-        test_button = tk.Button(command_frame, text="Тестувати", command=self.test)
         test_button.pack(side=tk.LEFT, padx=5, pady=5, ipadx=8)
 
         exit_button = tk.Button(command_frame, text="Вихід", command=self.exit_program)
@@ -100,17 +105,42 @@ class MainWindow:
 
         self.update_variable_list()  # Оновити панель змінних
 
-    def run_code(self):
-        """Порожня функція для Open"""
-        print("Run code functionality is not implemented yet.")
+        # -------------------------------------------------------------------------
+        # Реалізація "Run Code"
+        # -------------------------------------------------------------------------
 
-    def download_tests(self):
-        """Порожня функція для Open"""
-        print("Download tests functionality is not implemented yet.")
+    def run_code(self):
+        """
+        1) Відкрити діалогове вікно для вибору файлу з кодом.
+        2) Запитати у користувача вхідні дані, якщо код їх очікує.
+        3) Виконати код через CodeRunner і показати результат.
+        """
+        file_path = filedialog.askopenfilename(
+            title="Select Python Code",
+            filetypes=[("Python files", "*.py *.txt"), ("All files", "*.*")]
+        )
+        if not file_path:
+            return  # Користувач скасував вибір файлу
+
+        # Запитуємо вхідні дані у користувача (можна залишити порожнім, якщо не потрібно)
+        input_data = simpledialog.askstring("Input Data",
+                                            "Введіть вхідні дані для програми (якщо потрібно):",
+                                            parent=self.root)
+        if input_data is None:
+            input_data = ""  # Якщо користувач скасував, використовуємо порожній рядок
+
+        try:
+            output = self.code_runner.run_file(file_path, input_data)
+            messagebox.showinfo("Run Code", f"Output:\n{output}")
+        except Exception as e:
+            messagebox.showerror("Run Code Error", str(e))
 
     def test(self):
-        """Порожня функція для Open"""
-        print("Test functionality is not implemented yet.")
+        """
+        Натискання кнопки "Test" відкриває вікно для тестування та логування.
+        """
+        from testing.test_window import TestWindow
+        test_window = TestWindow(self.root)
 
     def exit_program(self):
         """Підтвердження перед закриттям програми"""
