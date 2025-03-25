@@ -1,0 +1,6 @@
+[
+    {
+        "input": "5",
+        "expected_output": "x = 10\nA = 5"
+    }
+]

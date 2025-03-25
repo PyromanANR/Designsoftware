@@ -1,0 +1,102 @@
+[
+    {
+        "timestamp": "2025-03-04 00:41:06",
+        "message": "Loaded code file: F:/IT/Python/Crossplatform/testing/testcode/incorrect_code.py"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:11",
+        "message": "Loaded tests from: F:/IT/Python/Crossplatform/tests2.json"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:14",
+        "message": "Set K to 4"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:15",
+        "message": "Starting tests..."
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "Test Summary:\nPassed (OK): 3 / 4\nCoverage for <= 4 steps: 75.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "Test #1: executed 4 variants, correct: 3, coverage: 75.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "  Variant #1: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "  Variant #2: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "  Variant #3: FAIL (expected '10', got '5') (output: 5)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:18",
+        "message": "  Variant #4: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:31",
+        "message": "Starting tests..."
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "Test Summary:\nPassed (OK): 1 / 4\nCoverage for <= 4 steps: 25.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "Test #1: executed 4 variants, correct: 1, coverage: 25.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "  Variant #1: FAIL (expected '10', got '5') (output: 5)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "  Variant #2: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "  Variant #3: FAIL (expected '10', got '5') (output: 5)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:33",
+        "message": "  Variant #4: FAIL (expected '10', got '5') (output: 5)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:47",
+        "message": "Loaded code file: F:/IT/Python/Crossplatform/testing/testcode/correct_code.py"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:48",
+        "message": "Starting tests..."
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "Test Summary:\nPassed (OK): 4 / 4\nCoverage for <= 4 steps: 100.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "Test #1: executed 4 variants, correct: 4, coverage: 100.00%"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "  Variant #1: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "  Variant #2: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "  Variant #3: OK (output: 10)"
+    },
+    {
+        "timestamp": "2025-03-04 00:41:50",
+        "message": "  Variant #4: OK (output: 10)"
+    }
+]
