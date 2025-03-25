@@ -1,4 +1,4 @@
-from graph import Graph
+from translation.graph import Graph
 
 class Thread:
     """Клас, що представляє один потік виконання."""

@@ -1,7 +1,7 @@
 from ..variable_selector import VariableSelector
 from ..block import Block
 
-class OutputBlock(Block):
+class PrintBlock(Block):
     def __init__(self, block_id, x, y, shared_variables, parent):
         super().__init__(block_id, x, y, shared_variables, parent)
         selector = VariableSelector(parent, shared_variables)

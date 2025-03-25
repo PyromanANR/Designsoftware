@@ -1,69 +1,82 @@
 {
     "name": "Diagram_2",
     "blocks": [
-      {
-        "id": 1,
-        "type": "StartBlock",
-        "x": 100,
-        "y": 50,
-        "text": "Start",
-        "connections": [{"to": 2}]
-      },
-      {
-        "id": 2,
-        "type": "InputBlock",
-        "x": 100,
-        "y": 150,
-        "text": "INPUT x",
-        "connections": [{"to": 3}]
-      },
-      {
-        "id": 3,
-        "type": "ConditionBlock",
-        "x": 100,
-        "y": 250,
-        "text": "x == 10",
-        "connections": [
-          {"to": 4, "condition": "так"},
-          {"to": 5, "condition": "ні"}
-        ]
-      },
-      {
-        "id": 4,
-        "type": "PrintBlock",
-        "x": 250,
-        "y": 350,
-        "text": "PRINT x",
-        "connections": [{"to": 6}]
-      },
-      {
-        "id": 5,
-        "type": "PrintBlock",
-        "x": 100,
-        "y": 350,
-        "text": "PRINT y",
-        "connections": [{"to": 6}]
-      },
-      {
-        "id": 6,
-        "type": "PrintBlock",
-        "x": 100,
-        "y": 450,
-        "text": "PRINT z",
-        "connections": [{"to": 7}]
-      },
-      {
-        "id": 7,
-        "type": "EndBlock",
-        "x": 100,
-        "y": 550,
-        "text": "End",
-        "connections": []
-      }
+        {
+            "id": 1,
+            "type": "StartBlock",
+            "x": 251,
+            "y": 49,
+            "text": "Початок",
+            "connections": [
+                {
+                    "to": 2
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "type": "InputBlock",
+            "x": 245,
+            "y": 149,
+            "text": "INPUT A",
+            "connections": [
+                {
+                    "to": 3
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "type": "ConditionBlock",
+            "x": 243,
+            "y": 244,
+            "text": "A == 5",
+            "connections": [
+                {
+                    "to": 4,
+                    "condition": "так"
+                },
+                {
+                    "to": 5,
+                    "condition": "ні"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "type": "PrintBlock",
+            "x": 98,
+            "y": 340,
+            "text": "PRINT A",
+            "connections": [
+                {
+                    "to": 6
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "type": "PrintBlock",
+            "x": 354,
+            "y": 335,
+            "text": "PRINT B",
+            "connections": [
+                {
+                    "to": 6
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "type": "EndBlock",
+            "x": 242,
+            "y": 447,
+            "text": "Кінець",
+            "connections": []
+        }
     ],
     "shared_variables": {
-      "x": 12,
-      "y": 0,
-      "z": 120
+        "A": 5,
+        "B": 2
     }
 }

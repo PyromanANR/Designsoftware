@@ -1,5 +1,6 @@
 import io
 import sys
+import builtins
 
 class CodeRunner:
     """
@@ -14,11 +15,15 @@ class CodeRunner:
 
         backup_stdout = sys.stdout
         backup_stdin = sys.stdin
+        backup_input = builtins.input  # зберігаємо оригінальну input
         output_buffer = io.StringIO()
         input_buffer = io.StringIO(input_data)
 
         sys.stdout = output_buffer
         sys.stdin = input_buffer
+
+        # Перепризначаємо built-in input, щоб використовувати наш input_buffer
+        builtins.input = lambda prompt="": input_buffer.readline().rstrip("\n")
 
         try:
             local_env = {}
@@ -26,5 +31,7 @@ class CodeRunner:
         finally:
             sys.stdout = backup_stdout
             sys.stdin = backup_stdin
+            builtins.input = backup_input  # відновлюємо оригінальну input
 
         return output_buffer.getvalue()
+

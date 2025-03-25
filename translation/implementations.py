@@ -1,4 +1,4 @@
-from block import Block
+from translation.block import Block
 
 class StartBlock(Block):
     def generate_code(self):
@@ -32,7 +32,7 @@ class InputBlock(Block):
         self.var = var
 
     def generate_code(self):
-        return f"{self.var} = int(input('Enter value for {self.var}: '))"
+        return f"{self.var} = int(input())"
 
 class PrintBlock(Block):
     def __init__(self, block_id, var):

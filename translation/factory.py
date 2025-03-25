@@ -1,4 +1,4 @@
-from implementations import StartBlock, EndBlock, AssignmentBlock, ConstantBlock, InputBlock, PrintBlock, ConditionBlock
+from translation.implementations import StartBlock, EndBlock, AssignmentBlock, ConstantBlock, InputBlock, PrintBlock, ConditionBlock
 
 class BlockFactory:
     """Фабрика для створення блоків"""

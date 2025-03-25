@@ -4,7 +4,7 @@ from .block_options import BlockOptionsDialog
 from .blocks.AssignmentBlock import AssignmentBlock
 from .blocks.ConstantBlock import ConstantBlock
 from .blocks.InputBlock import InputBlock
-from .blocks.OutputBlock import OutputBlock
+from .blocks.OutputBlock import PrintBlock
 from .blocks.ConditionBlock import ConditionBlock
 from .blocks.EndBlock import EndBlock
 from .blocks.StartBlock import StartBlock
@@ -49,7 +49,7 @@ class DiagramEditor(tk.Canvas):
             elif block_type == "Input (INPUT V)":
                 block = InputBlock(block_id, event.x, event.y, self.shared_variables, self)
             elif block_type == "Output (PRINT V)":
-                block = OutputBlock(block_id, event.x, event.y, self.shared_variables, self)
+                block = PrintBlock(block_id, event.x, event.y, self.shared_variables, self)
             elif block_type == "Condition (V == C)":
                 block = ConditionBlock(block_id, event.x, event.y, self.shared_variables, self, "==")
             elif block_type == "Condition (V < C)":
