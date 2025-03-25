@@ -25,6 +25,8 @@ class Diagram:
         for block in self.blocks:
             block.render(canvas)
 
+        canvas.redraw_connections()
+
     def to_dict(self):
         """Повертає JSON-структуру діаграми з блоками та спільними змінними."""
         data = {

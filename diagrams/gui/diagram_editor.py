@@ -28,10 +28,13 @@ class DiagramEditor(tk.Canvas):
         self.bind("<B1-Motion>", self.on_block_drag)  # Перетягування блоку
         self.bind("<ButtonRelease-1>", self.on_block_release)  # Завершення перетягування
 
+
         # Контекстне меню
         self.context_menu = tk.Menu(self, tearoff=0)
         self.context_menu.add_command(label="Видалити", command=self.delete_block)
         self.context_menu.add_command(label="З'єднати", command=self.connect_blocks_dialog)
+
+
 
     def add_block(self, event):
         """Додає блок з вибором типу після кліку"""

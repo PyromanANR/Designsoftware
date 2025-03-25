@@ -119,6 +119,7 @@ class MainWindow:
         editor.diagram.render(editor)
         self.update_variable_list()
 
+
     def run_code(self):
         json_dir = os.path.join(
             os.path.dirname(__file__),
