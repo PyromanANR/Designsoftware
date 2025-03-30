@@ -28,6 +28,7 @@ class MainWindow:
         self.test_manager = TestManager()
         self.tester = Tester()
         self.shared_variables = SharedVariables(self.update_variable_list)
+        self.tab_editors = {}  # словник: назва вкладки → DiagramEditor
 
         self.init_ui()
 
@@ -50,6 +51,9 @@ class MainWindow:
 
         exit_button = ctk.CTkButton(command_frame, text="Вихід", command=self.exit_program, width=120)
         exit_button.pack(side="right", padx=5, pady=5)
+
+        delete_tab_button = ctk.CTkButton(command_frame, text="Видалити сторінку", command=self.delete_page)
+        delete_tab_button.pack(side="right", padx=5, pady=5)
 
         new_page_button = ctk.CTkButton(command_frame, text="Нова сторінка", command=self.new_page, width=120)
         new_page_button.pack(side="right", padx=5, pady=5)
@@ -77,7 +81,7 @@ class MainWindow:
         self.update_variable_list()
 
         # Вкладки для потоків – CTkTabview
-        self.tabs = ctk.CTkTabview(self.root)
+        self.tabs = ctk.CTkTabview(self.root, fg_color="white")
         self.tabs.pack(side="left", fill="both", expand=True, padx=10, pady=10)
         self.page_count = 0
         self.new_page()
@@ -178,6 +182,9 @@ class MainWindow:
         editor.diagram.add_block(start_block)
         editor.diagram.render(editor)
 
+        # збереження редактора
+        self.tab_editors[diagram_name] = editor
+
     def run(self):
         self.root.mainloop()
 
@@ -258,4 +265,16 @@ class MainWindow:
         self.variable_listbox.delete("1.0", "end")
         for var_name, value in self.shared_variables.get_variables().items():
             self.variable_listbox.insert("end", f"{var_name} = {value}\n")
+
+    def delete_page(self):
+        current_tab_name = self.tabs.get()  # Назва активної вкладки
+        if current_tab_name:
+            confirm = messagebox.askyesno("Підтвердження", f"Видалити потік '{current_tab_name}'?")
+            if confirm:
+                # Видалити редактор і саму вкладку
+                editor = self.tab_editors.get(current_tab_name)
+                if editor:
+                    editor.destroy()  # знищити Canvas (DiagramEditor)
+                self.tabs.delete(current_tab_name)  # видалити вкладку
+                del self.tab_editors[current_tab_name]  # прибрати з словника
 
