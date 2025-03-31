@@ -1,3 +1,4 @@
+import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk, messagebox
 from .block_options import BlockOptionsDialog
@@ -30,7 +31,14 @@ class DiagramEditor(tk.Canvas):
 
 
         # Контекстне меню
-        self.context_menu = tk.Menu(self, tearoff=0)
+        self.context_menu = tk.Menu(self,
+                                    tearoff=0,
+                                    bg="#666565",
+                                    fg="white",
+                                    activebackground="#3e65a6",
+                                    activeforeground="white",
+                                    font=("Segoe UI", 11)
+        )
         self.context_menu.add_command(label="Видалити", command=self.delete_block)
         self.context_menu.add_command(label="З'єднати", command=self.connect_blocks_dialog)
 
@@ -40,6 +48,7 @@ class DiagramEditor(tk.Canvas):
         """Додає блок з вибором типу після кліку"""
         block_id = len(self.diagram.blocks) + 1
         dialog = BlockOptionsDialog(self, title="Виберіть тип блоку")
+        self.wait_window(dialog)
         block_type = dialog.selected_option
         if block_type is None:
             return
@@ -126,7 +135,7 @@ class DiagramEditor(tk.Canvas):
             self.current_block = None
 
     def connect_blocks_dialog(self):
-        """Відкриває діалогове вікно з випадаючими списками для вибору блоків."""
+        """Відкриває CTk-вікно з випадаючими списками для з'єднання блоків."""
         if self.current_block is None:
             return
 
@@ -139,34 +148,30 @@ class DiagramEditor(tk.Canvas):
             messagebox.showwarning("Помилка", "Немає доступних блоків для з'єднання.")
             return
 
-        dialog = tk.Toplevel(self)
-        dialog.title("Вибір блоку для з'єднання")
-        dialog.geometry("300x200")
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("З'єднання блоків")
+        dialog.geometry("320x260")
+        dialog.grab_set()
 
         if isinstance(self.current_block, ConditionBlock):
-            # Для блоків if – два випадаючі списки
-            tk.Label(dialog, text="Оберіть блок для 'Так':").pack(pady=5)
-            block_yes_var = tk.StringVar()
-            block_yes_dropdown = ttk.Combobox(dialog, textvariable=block_yes_var, state="readonly",
-                                              values=[b.text for b in available_blocks])
-            block_yes_dropdown.pack(pady=5)
+            ctk.CTkLabel(dialog, text="Оберіть блок для 'Так':", font=("Segoe UI", 12)).pack(pady=(20, 5))
+            block_yes_var = ctk.StringVar()
+            block_yes_menu = ctk.CTkOptionMenu(dialog, variable=block_yes_var,
+                                               values=[b.text for b in available_blocks])
+            block_yes_menu.pack(pady=5)
 
-            tk.Label(dialog, text="Оберіть блок для 'Ні':").pack(pady=5)
-            block_no_var = tk.StringVar()
-            block_no_dropdown = ttk.Combobox(dialog, textvariable=block_no_var, state="readonly",
-                                             values=[b.text for b in available_blocks])
-            block_no_dropdown.pack(pady=5)
+            ctk.CTkLabel(dialog, text="Оберіть блок для 'Ні':", font=("Segoe UI", 12)).pack(pady=(15, 5))
+            block_no_var = ctk.StringVar()
+            block_no_menu = ctk.CTkOptionMenu(dialog, variable=block_no_var, values=[b.text for b in available_blocks])
+            block_no_menu.pack(pady=5)
 
         else:
-            # Для всіх інших блоків – один випадаючий список
-            tk.Label(dialog, text="Оберіть блок для з'єднання:").pack(pady=5)
-            block_var = tk.StringVar()
-            block_dropdown = ttk.Combobox(dialog, textvariable=block_var, state="readonly",
-                                          values=[b.text for b in available_blocks])
-            block_dropdown.pack(pady=5)
+            ctk.CTkLabel(dialog, text="Оберіть блок для з'єднання:", font=("Segoe UI", 12)).pack(pady=(20, 5))
+            block_var = ctk.StringVar()
+            block_menu = ctk.CTkOptionMenu(dialog, variable=block_var, values=[b.text for b in available_blocks])
+            block_menu.pack(pady=5)
 
         def confirm_connection():
-            """Обробляє підтвердження вибору блоку для з'єднання."""
             if isinstance(self.current_block, ConditionBlock):
                 block_yes = next((b for b in available_blocks if b.text == block_yes_var.get()), None)
                 block_no = next((b for b in available_blocks if b.text == block_no_var.get()), None)
@@ -177,12 +182,8 @@ class DiagramEditor(tk.Canvas):
 
                 self.current_block.add_next_block(block_yes, "так")
                 self.current_block.add_next_block(block_no, "ні")
-
-                # ✅ Змінюємо колір блоку для "так" на зелений
                 self.itemconfig(block_yes.shape_id, fill="lightgreen")
-                # ❌ Змінюємо колір блоку для "ні" на червоний
                 self.itemconfig(block_no.shape_id, fill="lightcoral")
-
             else:
                 selected_block = next((b for b in available_blocks if b.text == block_var.get()), None)
                 if selected_block:
@@ -191,7 +192,13 @@ class DiagramEditor(tk.Canvas):
             self.redraw_connections()
             dialog.destroy()
 
-        tk.Button(dialog, text="З'єднати", command=confirm_connection).pack(pady=10)
+        ctk.CTkButton(dialog, text="З'єднати", command=confirm_connection).pack(pady=20)
+
+        # Центрування
+        dialog.update_idletasks()
+        x = self.winfo_rootx() + (self.winfo_width() - dialog.winfo_width()) // 2
+        y = self.winfo_rooty() + (self.winfo_height() - dialog.winfo_height()) // 2
+        dialog.geometry(f"+{x}+{y}")
 
     def redraw_connections(self):
         """Перемальовує всі зв’язки між блоками."""

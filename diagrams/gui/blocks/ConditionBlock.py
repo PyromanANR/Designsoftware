@@ -1,4 +1,5 @@
-from tkinter import simpledialog
+import customtkinter as ctk
+from tkinter import messagebox
 from ..variable_selector import VariableSelector
 from ..block import Block
 
@@ -15,22 +16,33 @@ class ConditionBlock(Block):
         if not self.var:
             raise ValueError("Вибір змінної скасовано")
 
-        # Вибір значення константи
-        self.value = simpledialog.askinteger("Вхідне значення", "Введіть константне значення:", parent=parent)
-        if self.value is None:
+        # Введення значення константи через CTkInputDialog
+        dialog = ctk.CTkInputDialog(
+            text=f"Введіть значення для перевірки ({self.var} {condition_type} ...):",
+            title="Константа умови"
+        )
+        value_str = dialog.get_input()
+        if value_str is None:
             raise ValueError("Скасовано введення константи")
+
+        try:
+            self.value = int(value_str)
+            if not (0 <= self.value <= 2**31 - 1):
+                raise ValueError
+        except ValueError:
+            messagebox.showerror("Помилка", "Константа має бути цілим числом у межах 0…2³¹-1.")
+            raise ValueError("Некоректне значення")
 
         self.condition = condition_type
         self.text = f"{self.var} {self.condition} {self.value}"
 
     def render(self, canvas):
         width, height = 200, 50
-        # Координати ромба: верх, правий, низ, лівий
         points = (
-            self.x + width / 2, self.y,  # Верхній центр
-            self.x + width, self.y + height / 2,  # Правий центр
-            self.x + width / 2, self.y + height,  # Нижній центр
-            self.x, self.y + height / 2  # Лівий центр
+            self.x + width / 2, self.y,
+            self.x + width, self.y + height / 2,
+            self.x + width / 2, self.y + height,
+            self.x, self.y + height / 2
         )
         self.shape_id = canvas.create_polygon(
             points,

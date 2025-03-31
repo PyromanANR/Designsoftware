@@ -1,5 +1,5 @@
-import tkinter as tk
-from tkinter import messagebox, ttk
+import customtkinter as ctk
+from tkinter import messagebox
 
 class VariableSelector:
     def __init__(self, parent, shared_variables):
@@ -7,7 +7,6 @@ class VariableSelector:
         self.shared_variables = shared_variables
 
     def select_variable(self, title="Виберіть змінну"):
-        """Вибір змінної з існуючих у списку"""
         variables = self.shared_variables.get_variables()
 
         if not variables:
@@ -17,7 +16,6 @@ class VariableSelector:
         return self._show_selection_window(title, list(variables.keys()))
 
     def select_two_variables(self):
-        """Вибір двох змінних (для блоків присвоєння V1 = V2)"""
         variables = self.shared_variables.get_variables()
 
         if len(variables) < 2:
@@ -27,30 +25,38 @@ class VariableSelector:
         var1 = self._show_selection_window("Виберіть Змінну 1", list(variables.keys()))
         var2 = self._show_selection_window("Виберіть Змінну 2", list(variables.keys()))
 
-        while var1 == var2:  # Забороняємо вибирати одну і ту ж змінну двічі
+        while var1 == var2:
             messagebox.showerror("Дублююча змінна", "Будь ласка, оберіть дві різні змінні.")
             var2 = self._show_selection_window("Виберіть Змінну 2", list(variables.keys()))
 
         return var1, var2
 
     def _show_selection_window(self, title, variable_list):
-        """Показує випадаючий список для вибору змінної"""
-        var_window = tk.Toplevel(self.parent)
-        var_window.title(title)
+        window = ctk.CTkToplevel(self.parent)
+        window.title(title)
+        window.geometry("300x160")
+        window.grab_set()
+        window.resizable(False, False)
 
-        tk.Label(var_window, text="Виберіть змінну:").pack(padx=10, pady=5)
+        ctk.CTkLabel(window, text="Виберіть змінну:", font=("Segoe UI", 12)).pack(pady=(20, 5))
 
-        var_choice = tk.StringVar()
-        var_combobox = ttk.Combobox(var_window, textvariable=var_choice, values=variable_list, state="readonly")
-        var_combobox.pack(padx=10, pady=5)
-        var_combobox.current(0)  # Встановлюємо першу змінну за замовчуванням
+        var_choice = ctk.StringVar(value=variable_list[0])
+        dropdown = ctk.CTkOptionMenu(window, variable=var_choice, values=variable_list)
+        dropdown.pack(pady=5)
+
+        result = {"selected": None}
 
         def confirm():
-            var_window.selected_var = var_choice.get()
-            var_window.destroy()
+            result["selected"] = var_choice.get()
+            window.destroy()
 
-        tk.Button(var_window, text="OK", command=confirm).pack(pady=5)
-        var_window.selected_var = None
-        var_window.wait_window()
+        ctk.CTkButton(window, text="OK", command=confirm).pack(pady=(15, 10))
 
-        return var_window.selected_var
+        # Центрування
+        window.update_idletasks()
+        x = self.parent.winfo_rootx() + (self.parent.winfo_width() - window.winfo_width()) // 2
+        y = self.parent.winfo_rooty() + (self.parent.winfo_height() - window.winfo_height()) // 2
+        window.geometry(f"+{x}+{y}")
+
+        window.wait_window()
+        return result["selected"]
