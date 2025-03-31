@@ -189,12 +189,26 @@ class MainWindow:
         self.root.mainloop()
 
     def add_variable(self):
-        name = simpledialog.askstring("Додати змінну", "Введіть назву змінної:", parent=self.root)
+        # Діалог для введення назви змінної
+        name_dialog = ctk.CTkInputDialog(text="Введіть назву змінної:", title="Додати змінну")
+        name = name_dialog.get_input()
         if not name:
             return
-        value = simpledialog.askinteger("Додати змінну", f"Введіть початкове значення для {name}:", parent=self.root)
-        if value is None:
+
+        # Діалог для введення значення
+        value_dialog = ctk.CTkInputDialog(text=f"Введіть початкове значення для {name}:", title="Додати значення")
+        value_str = value_dialog.get_input()
+        if value_str is None:
             return
+
+        try:
+            value = int(value_str)
+            if not (0 <= value <= 2 ** 31 - 1):
+                raise ValueError
+        except ValueError:
+            messagebox.showerror("Помилка", "Значення повинно бути цілим числом.")
+            return
+
         if self.shared_variables.add_variable(name, value):
             self.update_variable_list()
         else:
@@ -203,14 +217,14 @@ class MainWindow:
     def edit_variable(self):
         """
         Пропонує користувачу вибрати змінну з випадаючого списку,
-        а потім ввести нове значення для неї.
+        а потім ввести нове значення для неї через CTkInputDialog.
         """
         # Зчитуємо всі рядки з CTkTextbox
         lines = self.variable_listbox.get("1.0", "end").splitlines()
         if not lines:
             return
 
-        # Витягаємо імена змінних із кожного рядка
+        # Витягаємо імена змінних
         variable_names = []
         for line in lines:
             if " = " in line:
@@ -218,48 +232,85 @@ class MainWindow:
                 variable_names.append(var_name)
 
         if not variable_names:
-            return  # Немає змінних для редагування
+            return
 
-        # Створюємо тимчасове вікно для вибору змінної
+        # Вікно вибору змінної
         top = ctk.CTkToplevel(self.root)
         top.title("Оберіть змінну для редагування")
-        top.grab_set()  # робимо вікно модальним
+        top.grab_set()
 
         label = ctk.CTkLabel(top, text="Оберіть змінну:", font=("Segoe UI", 12))
         label.pack(padx=20, pady=(20, 10))
 
-        # Використовуємо CTkOptionMenu, щоб відобразити імена змінних
-        var_name_var = ctk.StringVar(value=variable_names[0])  # за замовчуванням перша змінна
+        var_name_var = ctk.StringVar(value=variable_names[0])
         option_menu = ctk.CTkOptionMenu(top, variable=var_name_var, values=variable_names)
         option_menu.pack(padx=20, pady=10)
 
         def confirm():
             selected_var = var_name_var.get()
             top.destroy()
-            # Запитуємо нове значення для обраної змінної
-            new_value = simpledialog.askinteger("Редагування змінної",
-                                                f"Введіть нове значення для {selected_var}:",
-                                                parent=self.root)
-            if new_value is not None:
-                self.shared_variables.update_variable(selected_var, new_value)
-                self.update_variable_list()
+
+            # Показуємо CTkInputDialog для введення нового значення
+            value_dialog = ctk.CTkInputDialog(text=f"Введіть нове значення для {selected_var}:",
+                                              title="Редагування змінної")
+            value_str = value_dialog.get_input()
+            if value_str is None:
+                return
+
+            try:
+                new_value = int(value_str)
+                if not (0 <= new_value <= 2 ** 31 - 1):
+                    raise ValueError
+            except ValueError:
+                messagebox.showerror("Помилка", "Значення повинно бути цілим числом.")
+                return
+
+            self.shared_variables.update_variable(selected_var, new_value)
+            self.update_variable_list()
 
         ok_button = ctk.CTkButton(top, text="OK", command=confirm)
         ok_button.pack(pady=(0, 20))
 
-        # Центруємо вікно над головним
+        # Центруємо вікно
         top.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() - top.winfo_width()) // 2
         y = self.root.winfo_y() + (self.root.winfo_height() - top.winfo_height()) // 2
         top.geometry(f"+{x}+{y}")
 
     def delete_variable(self):
-        lines = self.variable_listbox.get("1.0", "end").splitlines()
-        if not lines:
+        # Отримуємо список змінних
+        variables = self.shared_variables.get_variables()
+        if not variables:
             return
-        var_name = lines[0].split(" = ")[0]
-        if self.shared_variables.remove_variable(var_name):
-            self.update_variable_list()
+
+        variable_names = list(variables.keys())
+
+        # Вікно вибору змінної для видалення
+        top = ctk.CTkToplevel(self.root)
+        top.title("Видалити змінну")
+        top.grab_set()
+
+        label = ctk.CTkLabel(top, text="Оберіть змінну для видалення:", font=("Segoe UI", 12))
+        label.pack(padx=20, pady=(20, 10))
+
+        var_name_var = ctk.StringVar(value=variable_names[0])
+        option_menu = ctk.CTkOptionMenu(top, variable=var_name_var, values=variable_names)
+        option_menu.pack(padx=20, pady=10)
+
+        def confirm_delete():
+            selected_var = var_name_var.get()
+            top.destroy()
+            if self.shared_variables.remove_variable(selected_var):
+                self.update_variable_list()
+
+        delete_button = ctk.CTkButton(top, text="Видалити", command=confirm_delete)
+        delete_button.pack(pady=(0, 20))
+
+        # Центрування
+        top.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() - top.winfo_width()) // 2
+        y = self.root.winfo_y() + (self.root.winfo_height() - top.winfo_height()) // 2
+        top.geometry(f"+{x}+{y}")
 
     def update_variable_list(self):
         self.variable_listbox.delete("1.0", "end")
@@ -277,4 +328,3 @@ class MainWindow:
                     editor.destroy()  # знищити Canvas (DiagramEditor)
                 self.tabs.delete(current_tab_name)  # видалити вкладку
                 del self.tab_editors[current_tab_name]  # прибрати з словника
-
