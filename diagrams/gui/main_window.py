@@ -2,6 +2,7 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox, simpledialog
 import os
 import json
+import subprocess
 
 from .diagram_editor import DiagramEditor
 from .shared_variables import SharedVariables
@@ -123,30 +124,75 @@ class MainWindow:
         editor.diagram.render(editor)
         self.update_variable_list()
 
-
     def run_code(self):
+        # Визначити шлях до JSON файлів
         json_dir = os.path.join(
             os.path.dirname(__file__),
             '..', '..',
             'translation',
             'diagramJson'
         )
+
+        # Отримати всі JSON файли
         json_files = [os.path.join(json_dir, file) for file in os.listdir(json_dir) if file.endswith(".json")]
+
+        # Спільні змінні та список потоків
         shared_variables = {}
         threads = []
+
+        # Обробка кожного JSON файлу
         for filename in json_files:
             try:
                 with open(filename, "r", encoding="utf-8") as f:
                     data = json.load(f)
+                
+                # Перевірити наявність необхідних полів
+                if "name" not in data or "shared_variables" not in data:
+                    messagebox.showwarning("Попередження", f"Пропущено {filename} через відсутність необхідних полів.")
+                    continue
+
                 shared_variables.update(data.get("shared_variables", {}))
                 thread = Thread(thread_id=data["name"], shared_vars=shared_variables)
                 thread.build_from_json(data)
                 threads.append(thread)
+
             except Exception as e:
-                print(f"Помилка при обробці файлу {filename}: {e}")
-        writer = Writer("generated_code.py")
+                messagebox.showerror("Помилка", f"Помилка при обробці файлу {filename}: {e}")
+
+        # Записати згенерований код у файл
+        generated_code_file = "generated_code.py"
+        writer = Writer(generated_code_file)
         writer.write_code(threads, shared_variables)
-        print("Код згенеровано у файлі 'generated_code.py'")
+
+        # Отримати абсолютний шлях до generated_code.py
+        generated_code_file = os.path.abspath(os.path.join(
+            os.path.dirname(__file__),
+            '..', '..',
+            'translation',
+            'codePython',
+            'generated_code.py'
+        ))
+
+        # Показати спливаюче повідомлення
+        open_in_notepad = messagebox.askyesno("Готово!", f"Код згенеровано у файлі:\n{generated_code_file}\nВідкрити у Notepad++?")
+
+        if open_in_notepad:
+        # Спочатку спробувати відкрити за допомогою Notepad++
+            try:
+                ##subprocess.run([r"C:\Program Files\Notepad++\notepad++.exe", generated_code_file], check=True)
+                subprocess.run(["notepad++.exe", generated_code_file], check=True)
+            except FileNotFoundError:
+                # Якщо Notepad++ не знайдений, спробувати використати стандартний Notepad
+                try:
+                    subprocess.run(["notepad.exe", generated_code_file], check=True)
+                except FileNotFoundError:
+                    # Якщо не вдалося знайти Notepad, показати повідомлення про помилку
+                    messagebox.showerror("Помилка", "Не вдалося відкрити файл. Не знайдено Notepad або Notepad++.")
+                except Exception as e:
+                    messagebox.showerror("Помилка", f"Не вдалося відкрити файл за допомогою Notepad: {e}")
+            except Exception as e:
+                messagebox.showerror("Помилка", f"Не вдалося відкрити файл за допомогою Notepad++: {e}")
+
 
     def test(self):
         """
