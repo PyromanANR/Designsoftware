@@ -29,12 +29,17 @@ class Tester:
                 result = self._execute_code_with_input(code_path, input_data)
                 variant_count += 1
 
-                # Перевірка збігу з очікуваним результатом
-                if result.strip() == expected_output.strip():
-                    st = "OK"
-                    correct_count += 1
+                # 1) Якщо вивід містить рядок "Traceback" або "[Error in", вважаємо що це помилка в коді
+                if "Traceback" in result or "[Error in" in result:
+                    st = "ERROR"  # або "CODE ERROR"
+                    # Можете записати в лог детальніше, що сталася саме помилка в коді
                 else:
-                    st = f"FAIL (expected '{expected_output.strip()}', got '{result.strip()}')"
+                    # 2) Якщо це не помилка в коді, тоді порівнюємо з очікуваним виводом
+                    if result.strip() == expected_output.strip():
+                        st = "OK"
+                        correct_count += 1
+                    else:
+                        st = f"FAIL (expected '{expected_output.strip()}', got '{result.strip()}')"
 
                 # Додаємо запис у лог для кожного запуску
                 test_log.append({
@@ -80,16 +85,25 @@ class Tester:
     def _execute_code_with_input(self, code_path: str, input_data: str) -> str:
         """
         Виконує Python-код як зовнішній процес із підстановкою вхідних даних.
-        Повертає stdout, зчитаний з процесу.
+        Об’єднує stderr зі stdout, щоб traceback і повідомлення про помилки
+        поверталися разом із нормальним виводом.
         """
         try:
             result = subprocess.run(
                 ["python", code_path],
                 input=input_data,
-                capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
+                stdout=subprocess.PIPE,  # <-- замість capture_output
+                stderr=subprocess.STDOUT  # <-- об'єднуємо потоки
             )
-            return result.stdout
+            combined_output = result.stdout
+
+            # Якщо код завершився помилкою (ненульовий returncode), додамо позначку
+            if result.returncode != 0:
+                combined_output = f"[Error in {code_path}]\n{combined_output}"
+
+            return combined_output
         except Exception as e:
+            # Наприклад, якщо subprocess.run зірветься по таймауту
             return f"Error during execution: {e}"
