@@ -11,12 +11,10 @@ class ConditionBlock(Block):
         super().__init__(block_id, x, y, shared_variables, parent)
         selector = VariableSelector(parent, shared_variables)
 
-        # Вибір змінної
         self.var = selector.select_variable("Виберіть змінну")
         if not self.var:
             raise ValueError("Вибір змінної скасовано")
 
-        # Введення значення константи через CTkInputDialog
         dialog = ctk.CTkInputDialog(
             text=f"Введіть значення для перевірки ({self.var} {condition_type} ...):",
             title="Константа умови"
@@ -37,20 +35,26 @@ class ConditionBlock(Block):
         self.text = f"{self.var} {self.condition} {self.value}"
 
     def render(self, canvas):
-        width, height = 200, 50
+        width = 280
+        height = 80
+
         points = (
-            self.x + width / 2, self.y,
-            self.x + width, self.y + height / 2,
-            self.x + width / 2, self.y + height,
-            self.x, self.y + height / 2
+            self.x + width / 2, self.y,                 # Верхній центр
+            self.x + width, self.y + height / 2,        # Правий центр
+            self.x + width / 2, self.y + height,        # Нижній центр
+            self.x, self.y + height / 2                 # Лівий центр
         )
         self.shape_id = canvas.create_polygon(
             points,
-            fill="white", outline="black",
+            fill="white",
+            outline="black",
+            width=2,
             tags=f"block_{self.block_id}"
         )
         self.text_id = canvas.create_text(
             self.x + width / 2, self.y + height / 2,
             text=self.text,
+            font=("Segoe UI", 20, "bold"),
+            fill="black",
             tags=f"block_{self.block_id}"
         )

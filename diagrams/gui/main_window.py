@@ -23,7 +23,9 @@ class MainWindow:
     def __init__(self):
         self.root = ctk.CTk()  # Використовуємо CTk замість стандартного tk.Tk()
         self.root.title("Багатопотоковий редактор блок-схем")
-        self.root.geometry("1200x600")
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        self.root.geometry(f"{screen_width}x{screen_height - 70}+0+0")
 
         self.code_runner = CodeRunner()
         self.test_manager = TestManager()
@@ -240,7 +242,7 @@ class MainWindow:
         tab = self.tabs.tab(unique_name)
         editor = DiagramEditor(tab, self.shared_variables, unique_name)
         editor.pack(fill="both", expand=True)
-        start_block = StartBlock(block_id=1, x=250, y=50, shared_variables=self.shared_variables, parent=editor)
+        start_block = StartBlock(block_id=1, x=800, y=50, shared_variables=self.shared_variables, parent=editor)
         editor.diagram.add_block(start_block)
         editor.diagram.render(editor)
 

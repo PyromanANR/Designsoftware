@@ -39,8 +39,8 @@ class DiagramEditor(tk.Canvas):
                                     activeforeground="white",
                                     font=("Segoe UI", 11)
         )
-        self.context_menu.add_command(label="Видалити", command=self.delete_block)
-        self.context_menu.add_command(label="З'єднати", command=self.connect_blocks_dialog)
+        self.context_menu.add_command(label="Видалити", command=self.delete_block, font=("Segoe UI", 18))
+        self.context_menu.add_command(label="З'єднати", command=self.connect_blocks_dialog, font=("Segoe UI", 18))
 
 
 
@@ -210,9 +210,9 @@ class DiagramEditor(tk.Canvas):
                 else:
                     target_block = next_block
 
-                self.create_line(block.x + 100, block.y + 50,
-                                 target_block.x + 100, target_block.y,
-                                 arrow=tk.LAST, tags="connection")
+                self.create_line(block.x + 140, block.y + 80,
+                                 target_block.x + 140, target_block.y,
+                                 arrow=tk.LAST, width=2, tags="connection")
 
         # Оновлюємо кольори всіх блоків після перерисування
         for block in self.diagram.blocks:
