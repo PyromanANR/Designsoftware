@@ -34,58 +34,74 @@ class MainWindow:
         self.init_ui()
 
     def init_ui(self):
-        # Рядок команд
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
+        # Верхня панель кнопок
         command_frame = ctk.CTkFrame(self.root, corner_radius=8)
-        command_frame.pack(side="top", fill="x", padx=10, pady=10)
+        command_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
+        command_frame.grid_columnconfigure(4, weight=1)  # щоб розсунути кнопки ліворуч
 
-        save_button = ctk.CTkButton(command_frame, text="Зберегти", command=self.save, width=120)
-        save_button.pack(side="left", padx=5, pady=5)
+        save_button = ctk.CTkButton(command_frame, text="Зберегти", command=self.save, width=120, font=("Segoe UI", 16))
+        save_button.grid(row=0, column=0, padx=5, pady=5)
+        open_button = ctk.CTkButton(command_frame, text="Відкрити", command=self.open_file, width=120, font=("Segoe UI", 16))
+        open_button.grid(row=0, column=1, padx=5, pady=5)
+        run_button = ctk.CTkButton(command_frame, text="Запустити", command=self.run_code, width=120, font=("Segoe UI", 16))
+        run_button.grid(row=0, column=2, padx=5, pady=5)
+        test_button = ctk.CTkButton(command_frame, text="Test", command=self.test, width=120, font=("Segoe UI", 16))
+        test_button.grid(row=0, column=3, padx=5, pady=5)
+        exit_button = ctk.CTkButton(command_frame, text="Вихід", command=self.exit_program, width=120, font=("Segoe UI", 16))
+        exit_button.grid(row=0, column=5, padx=5, pady=5)
 
-        open_button = ctk.CTkButton(command_frame, text="Відкрити", command=self.open_file, width=120)
-        open_button.pack(side="left", padx=5, pady=5)
+        # Основна частина: діаграми + змінні
+        content_frame = ctk.CTkFrame(self.root)
+        content_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+        content_frame.grid_rowconfigure(0, weight=1)
+        content_frame.grid_columnconfigure(0, weight=1)
+        content_frame.grid_columnconfigure(1, weight=0)
 
-        run_button = ctk.CTkButton(command_frame, text="Запустити", command=self.run_code, width=120)
-        run_button.pack(side="left", padx=5, pady=5)
+        self.tabs = ctk.CTkTabview(content_frame, fg_color="white")
+        self.tabs.grid(row=0, column=0, sticky="nsew", padx=(0, 5), pady=0)
 
-        test_button = ctk.CTkButton(command_frame, text="Test", command=self.test, width=120)
-        test_button.pack(side="left", padx=5, pady=5)
-
-        exit_button = ctk.CTkButton(command_frame, text="Вихід", command=self.exit_program, width=120)
-        exit_button.pack(side="right", padx=5, pady=5)
-
-        delete_tab_button = ctk.CTkButton(command_frame, text="Видалити сторінку", command=self.delete_page)
-        delete_tab_button.pack(side="right", padx=5, pady=5)
-
-        new_page_button = ctk.CTkButton(command_frame, text="Нова сторінка", command=self.new_page, width=120)
-        new_page_button.pack(side="right", padx=5, pady=5)
-
-        # Фрейм для управління змінними (зменшено висоту текстового поля)
-        variable_frame = ctk.CTkFrame(self.root, corner_radius=8)
-        variable_frame.pack(side="right", fill="y", padx=10, pady=10)
-
-        var_label = ctk.CTkLabel(variable_frame, text="Спільні змінні:", font=("Segoe UI", 12))
-        var_label.pack(pady=(0, 5))
-
-        self.variable_listbox = ctk.CTkTextbox(variable_frame, height=80, font=("Segoe UI", 12))
-        self.variable_listbox.pack(fill="both", expand=True)
-
-        btn_frame = ctk.CTkFrame(variable_frame, corner_radius=8)
-        btn_frame.pack(fill="x", pady=10)
-
-        add_button = ctk.CTkButton(btn_frame, text="Додати", command=self.add_variable)
-        add_button.pack(side="left", fill="x", expand=True, padx=2)
-        edit_button = ctk.CTkButton(btn_frame, text="Редагувати", command=self.edit_variable)
-        edit_button.pack(side="left", fill="x", expand=True, padx=2)
-        del_button = ctk.CTkButton(btn_frame, text="Видалити", command=self.delete_variable)
-        del_button.pack(side="left", fill="x", expand=True, padx=2)
-
-        self.update_variable_list()
-
-        # Вкладки для потоків – CTkTabview
-        self.tabs = ctk.CTkTabview(self.root, fg_color="white")
-        self.tabs.pack(side="left", fill="both", expand=True, padx=10, pady=10)
         self.page_count = 0
         self.new_page()
+
+        # Поле змінних
+        variable_frame = ctk.CTkFrame(content_frame, corner_radius=8)
+        variable_frame.grid(row=0, column=1, sticky="ns", pady=0)
+
+        var_label = ctk.CTkLabel(variable_frame, text="Спільні змінні:", font=("Segoe UI", 16))
+        var_label.pack(pady=(0, 5))
+
+        self.variable_listbox = ctk.CTkTextbox(variable_frame, font=("Segoe UI", 16), width=360, height=200)
+        self.variable_listbox.pack(fill="both", expand=True, padx=5, pady=5)
+
+        # Нижня панель
+        bottom_frame = ctk.CTkFrame(self.root)
+        bottom_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=(0, 10))
+        bottom_frame.grid_columnconfigure(0, weight=0)
+        bottom_frame.grid_columnconfigure(1, weight=1)
+        bottom_frame.grid_columnconfigure(2, weight=0)
+
+        # Кнопки сторінок зліва
+        page_btn_frame = ctk.CTkFrame(bottom_frame, corner_radius=8)
+        page_btn_frame.grid(row=0, column=0, sticky="w")
+        new_page_button = ctk.CTkButton(page_btn_frame, text="Нова сторінка", command=self.new_page, width=140, font=("Segoe UI", 16))
+        new_page_button.pack(side="left", padx=2, pady=2)
+        delete_tab_button = ctk.CTkButton(page_btn_frame, text="Видалити сторінку", command=self.delete_page, width=140, font=("Segoe UI", 16))
+        delete_tab_button.pack(side="left", padx=2, pady=2)
+
+        # Кнопки змінних справа
+        var_btn_frame = ctk.CTkFrame(bottom_frame, corner_radius=8)
+        var_btn_frame.grid(row=0, column=2, sticky="e")
+        add_button = ctk.CTkButton(var_btn_frame, text="Додати", command=self.add_variable, width=120, font=("Segoe UI", 16))
+        add_button.pack(side="left", padx=2, pady=2)
+        edit_button = ctk.CTkButton(var_btn_frame, text="Редагувати", command=self.edit_variable, width=120, font=("Segoe UI", 16))
+        edit_button.pack(side="left", padx=2, pady=2)
+        del_button = ctk.CTkButton(var_btn_frame, text="Видалити", command=self.delete_variable, width=120, font=("Segoe UI", 16))
+        del_button.pack(side="left", padx=2, pady=2)
+
+        self.update_variable_list()
 
     def save(self):
         """Зберігає всі діаграми у JSON-файли."""
